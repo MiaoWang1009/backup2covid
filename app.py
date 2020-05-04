@@ -137,6 +137,7 @@ colors_World = colors_World.set_index('country').to_dict()['colors']
 us_confirmed = pd.read_csv("JHU/time_series_covid19_confirmed_US.csv")
 us_confirmedR = calculate_growth_rate_US(us_confirmed)
 us_confirmedR.drop('Diamond Princess', axis = 1, inplace = True)
+us_confirmedR.drop('Guam', axis = 1, inplace = True)
 ### US Death
 us_death = pd.read_csv("JHU/time_series_covid19_deaths_US.csv")
 us_death.drop('Population', axis = 1, inplace = True)
@@ -375,10 +376,10 @@ NAVBAR = dbc.Navbar(
 FLATTEN_THE_CURVE = [
     dbc.CardHeader(html.H5("Flatten The Curve - US")),
     dbc.CardBody([
-        html.P("This page evaluated the lockdown and growth rates timeline on two levels: national-wise and global-wise. In the US, 42 states were on lockdown by Apr 7 (marked red), whereas most states in the central US were already partially open by Apr 21. Most states which are partially open claimed the stay-at-home earlier, whereas states with main metropolitan areas and cities generally started the lockdown later since there were more effects and concerns to lockdown major cities. ", className="card-text"),
-        html.P("On the global level, the line chart demonstrated which government handled the pandemic effectively. For instance, South Korea started the lockdown right at the first outbreak and effectively stopped the spreading of the virus. Unfortunately, Italy had missed the best time to lock down the country, as shown that the stay-at-home order was not issued until several outbreaks. ", className="card-text"),
-        html.P("The visualization showed that the stay-at-home order had helped flatten the curve, since the growth rates of both new cases and death had been steadily decreasing since the lockdowns on both national-wide and world-wide levels.", className="card-text"),
-        html.P("Select multiple countries in the dropdown and control the slider to see the change of the lockdown policy on the maps and the fluctuation of growth rate in confirmed cases and death through time on the line charts. "),
+        html.P("This page evaluates the lockdown and growth rates timeline on two levels: national-wise and global-wise. In the US, 42 states were on lockdown by Apr 7 (marked red), whereas most states in the central US were already partially open by Apr 21. Most states which are partially open claimed the stay-at-home earlier, whereas states with main metropolitan areas and cities generally started the lockdown later since there were more effects and concerns to lockdown major cities.", className="card-text"),
+        html.P("On the global level, the line chart demonstrates which government handled the pandemic effectively. For instance, South Korea started the lockdown right at the first outbreak and effectively stopped the spreading of the virus. Unfortunately, Italy missed the best time to lock down the country, as shown that the stay-at-home order was not issued until several outbreaks. ", className="card-text"),
+        html.P("The visualization shows that the stay-at-home order has helped flatten the curve, since the growth rates of both new cases and death have been steadily decreasing since the lockdowns on both national-wide and world-wide levels.", className="card-text"),
+        html.P("Select multiple countries in the dropdown and control the slider to see the change of the lockdown policy on the maps and the fluctuation of growth rate in confirmed cases and death through time on the line charts."),
         #print(world_confirmedR.columns),
         dbc.Row([
             html.Label("Select countries to include in the line plot:", style={'marginLeft':'10px'}),
@@ -433,62 +434,69 @@ FLATTEN_THE_CURVE = [
         ]),
 
         dbc.CardHeader(html.H5("Flatten The Curve - Global"), style = {'marginTop': '20px'}),
-        dbc.Row([
-            dbc.Col([
-                html.Label('Select states to include in the line plot: '),
-                dcc.Dropdown(
-                            id = "selected_states",
-                            options=[{'label': x, 'value': x} for x in list(us_confirmedR.columns[1:])],
-                            value= ['New York', 'California', 'Georgia', 'Pennsylvania', 'Colorado', 'Florida', 'Delaware'],
-                            multi=True
-                            )
-                ], width = 12)
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    html.Label('Select states to include in the line plot: '),
+                    dcc.Dropdown(
+                                id = "selected_states",
+                                options=[{'label': x, 'value': x} for x in list(us_confirmedR.columns[1:])],
+                                value= ['New York', 'California', 'Georgia', 'Pennsylvania', 'Colorado', 'Florida', 'Delaware'],
+                                multi=True
+                                )
+                    ], width = 12)
 
-            ]),
-        
-        dbc.Row([
-            dbc.Col([
-                dcc.Graph(id='world_lockdown_map'),
-                dcc.Slider(id = 'world_lockdown_slider',
-                                    marks = {0:{'label':'Jan 23'}, 1:{'label':''}, 2:{'label':''}, 3:{'label':'Feb 25'}, 
-                                    4:{'label':''}, 5:{'label':''}, 6:{'label':'Mar 5'}, 7:{'label':''}, 
-                                    8:{'label':''}, 9:{'label':''}, 10:{'label':'Mar 10'}, 11:{'label':''}, 
-                                    12:{'label':''}, 13:{'label':''}, 14:{'label':''}, 15:{'label':'Mar 15'}, 
-                                    16:{'label':''}, 17:{'label':''}, 18:{'label':''}, 19:{'label':''}, 
-                                    20:{'label':'Mar 20'}, 21:{'label':''}, 22:{'label':''}, 23:{'label':''}, 
-                                    24:{'label':''}, 25:{'label':'Mar 25'}, 26:{'label':''}, 27:{'label':''}, 
-                                    28:{'label':''}, 29:{'label':''}, 30:{'label':'Mar 30'}, 31:{'label':''}
-                                    },
-                                    min = 0,
-                                    max = 31,
-                                    value = 16,
-                                    included = False,
-                                    updatemode='drag'                                    
-                                    )   
-
-                ], width = 5),
-            dbc.Col([
-                html.Div([
-                     html.Img(src = "assets/legend4.jpeg", style = {'height': '70%', 'marginTop': '60px', 'float': 'left'
-                            ,'width':'70%'})
-                    ], style={'vertical-align': 'middle'})
-            ],width = 0.5),
-
-            dbc.Col([
-                html.Div([], style={'height': '20px'}),
-                html.Label('Select Metrics'),
-                dcc.Dropdown(
-                        id = "selected_measure2",
-                        options = [{'label': 'Confirmed Growth Rate', 'value': 'confirmed'},
-                                   {'label': 'Death Growth Rate', 'value': 'death'}],
-                        value = 'confirmed'
-                        ),
-                dcc.Graph(id = "lineplot2")
-
-                ], width = 5)
+                ]),
             
+            dbc.Row([
+                dbc.Col([
+                    html.Br(),
+                    html.Label('No Lockdown ', style = {'color': '#cce6ff', 'margin-right': '20px'}),
+                    html.Label(' Partial Lockdown ', style = {'color': '#857aad', 'margin-right': '20px'}),
+                    html.Label(' Full Lockdown ', style = {'color': '#690a3d'}),
+                    #html.P("Light Blue: No Lockdown, Purple: Partial Lockdown, Maroon: Full Lockdown "),
+                    dcc.Graph(id='world_lockdown_map'),
+                    dcc.Slider(id = 'world_lockdown_slider',
+                                        marks = {0:{'label':'Jan 23'}, 1:{'label':''}, 2:{'label':''}, 3:{'label':'Feb 25'}, 
+                                        4:{'label':''}, 5:{'label':''}, 6:{'label':'Mar 5'}, 7:{'label':''}, 
+                                        8:{'label':''}, 9:{'label':''}, 10:{'label':'Mar 10'}, 11:{'label':''}, 
+                                        12:{'label':''}, 13:{'label':''}, 14:{'label':''}, 15:{'label':'Mar 15'}, 
+                                        16:{'label':''}, 17:{'label':''}, 18:{'label':''}, 19:{'label':''}, 
+                                        20:{'label':'Mar 20'}, 21:{'label':''}, 22:{'label':''}, 23:{'label':''}, 
+                                        24:{'label':''}, 25:{'label':'Mar 25'}, 26:{'label':''}, 27:{'label':''}, 
+                                        28:{'label':''}, 29:{'label':''}, 30:{'label':'Mar 30'}, 31:{'label':''}
+                                        },
+                                        min = 0,
+                                        max = 31,
+                                        value = 16,
+                                        included = False,
+                                        updatemode='drag'                                    
+                                        )   
 
+                    ], width = 5),
+                # dbc.Col([
+                #     html.Div([
+                #          html.Img(src = "assets/legend4.jpeg", style = {'height': '70%', 'marginTop': '60px', 'float': 'left'
+                #                 ,'width':'70%'})
+                #         ], style={'vertical-align': 'middle'})
+                # ],width = 0.5),
 
+                dbc.Col([
+                    html.Div([], style={'height': '20px'}),
+                    html.Label('Select Metrics'),
+                    dcc.Dropdown(
+                            id = "selected_measure2",
+                            options = [{'label': 'Confirmed Growth Rate', 'value': 'confirmed'},
+                                    {'label': 'Death Growth Rate', 'value': 'death'}],
+                            value = 'confirmed'
+                            ),
+                    dcc.Graph(id = "lineplot2")
+
+                    ], width = 7),
+            
+            
+        ]),
+        
         ])
 
 
@@ -648,7 +656,7 @@ INTRO =[
 
             dbc.Col([
                 html.P("The pandemic of COVID-19 has become one of the major challenges of global public health. To help the public and decision-makers better understand the trend and the influence of COVID-19, this project not only creates visualizations to demonstrate the underlying patterns of COVID-19 and its impacts, but also added interactive features which allow users to focus on many of the relevant aspects and obtain interesting findings through the rich information. The website contains six tabs, representing COVID-19’s overview and its impacts on Lockdown, Mobility, Public Opinion, Unemployment, and Legislation to answer if the curve has been flattened through various perspectives such as social media, mobility, unemployment, etc. ", className="card-text"),
-                html.P()
+                html.Br()
                 ], width = 6)
             ]),
         html.Br(),
@@ -1144,10 +1152,10 @@ def update_fig(selected_countries, selected_measure):
 
     if selected_measure == "confirmed":
         layout = {"title": "Confirmed Case Growth Rate ", "height": 450, "plot_bgcolor": '#f5f7fa',
-                    "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest', 'width':'90%'}
+                    "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest'}
     elif selected_measure == "death":
         layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa',
-                     "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest', 'width':'90%'}
+                     "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest'}
 
 
     return dict(data = data,
@@ -1231,9 +1239,9 @@ def update_fig2(selected_states, selected_measure2):
     data = data  + NY + CA + others1 + others2
     
     if selected_measure2 == "confirmed":
-        layout = {"title": "Confirmed Case Growth Rate ", "height": 450,  "plot_bgcolor": '#f5f7fa','hovermode': 'closest', 'width':'80%'}
+        layout = {"title": "Confirmed Case Growth Rate ", "height": 450,  "plot_bgcolor": '#f5f7fa','hovermode': 'closest'}
     elif selected_measure2 == "death":
-        layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa','hovermode': 'closest', 'width':'80%'}
+        layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa','hovermode': 'closest'}
 
     return dict(data = data,
                 layout = layout)
@@ -1311,7 +1319,7 @@ def update_figure(world_time):
     fig.update_geos(lataxis_showgrid=False, lonaxis_showgrid=False, 
                     projection_type="natural earth",showcountries=True)             
     fig.update_layout(
-    title_text = 'Worldwide Lockdown by Regions',
+    title_text = 'Worldwide Lockdown Timeline',
     margin=dict(l=0, r=0, t=80, b=0, pad = 0),
     coloraxis_showscale = False
     )
@@ -2350,4 +2358,4 @@ def update_table(search_text, selected_state, selected_status):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
