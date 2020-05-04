@@ -187,16 +187,13 @@ color2 = ["#e8f5c8","#aebaf8"]
 #######world
 df_world = pd.read_csv('countryLockdown_date.csv')
 
-df_world['area'] = df_world['type'].map({0: 'Not lockdown', 0.5: 'Partial lockdown', 1: 'Full lockdown'})
+df_world['area'] = df_world['type'].map({0: 'No lockdown', 0.5: 'Partial lockdown', 1: 'Full lockdown'})
 
 for col in df_world.columns: 
     df_world[col] = df_world[col].astype(str)
-
+df_world['type']=df_world['type'].astype(float)
 df_world['text'] = df_world['date'] + df_world['region'] + ': ' + df_world['area'] 
-
 world_date = list(df_world.date.unique())
-world_date = sorted(world_date, key=lambda date: datetime.datetime.strptime(date, "%m/%d/%y"))
-
 color_lock = [ 'rgb(204,230,255)', 'rgb(133,122,173)', 'rgb(105,10,61)']
 
 
@@ -460,7 +457,7 @@ FLATTEN_THE_CURVE = [
                                     16:{'label':''}, 17:{'label':''}, 18:{'label':''}, 19:{'label':''}, 
                                     20:{'label':'Mar 20'}, 21:{'label':''}, 22:{'label':''}, 23:{'label':''}, 
                                     24:{'label':''}, 25:{'label':'Mar 25'}, 26:{'label':''}, 27:{'label':''}, 
-                                    28:{'label':'Mar 28'}, 29:{'label':''}, 30:{'label':'Mar 30'}, 31:{'label':''}
+                                    28:{'label':''}, 29:{'label':''}, 30:{'label':'Mar 30'}, 31:{'label':''}
                                     },
                                     min = 0,
                                     max = 31,
@@ -469,7 +466,13 @@ FLATTEN_THE_CURVE = [
                                     updatemode='drag'                                    
                                     )   
 
-                ], width = 6),
+                ], width = 5),
+            dbc.Col([
+                html.Div([
+                     html.Img(src = "assets/legend4.jpeg", style = {'height': '70%', 'marginTop': '60px', 'float': 'left'
+                            ,'width':'70%'})
+                    ], style={'vertical-align': 'middle'})
+            ],width = 0.5),
 
             dbc.Col([
                 html.Div([], style={'height': '20px'}),
@@ -482,7 +485,7 @@ FLATTEN_THE_CURVE = [
                         ),
                 dcc.Graph(id = "lineplot2")
 
-                ], width = 6)
+                ], width = 5)
             
 
 
@@ -644,7 +647,7 @@ INTRO =[
                 ], width = 6),
 
             dbc.Col([
-                html.P("The pandemic of COVID-19 has become one of the major challenges of global public health. To help the public and decision-makers better understand the trend and influence of COVID-19, this project not only created visualizations to demonstrate the underlying patterns of COVID-19 and its impacts, but also added interactive features which allowed users to focus on the relevant aspects and obtain interesting findings from the information. The website contained six tabs, representing COVID-19’s overview and its impacts on Lockdown, Mobility, Public Opinion, Unemployment, and Legislation to answer if the curve has been flattened through various perspectives such as social media, mobility, unemployment, etc. ", className="card-text"),
+                html.P("The pandemic of COVID-19 has become one of the major challenges of global public health. To help the public and decision-makers better understand the trend and the influence of COVID-19, this project not only creates visualizations to demonstrate the underlying patterns of COVID-19 and its impacts, but also added interactive features which allow users to focus on many of the relevant aspects and obtain interesting findings through the rich information. The website contains six tabs, representing COVID-19’s overview and its impacts on Lockdown, Mobility, Public Opinion, Unemployment, and Legislation to answer if the curve has been flattened through various perspectives such as social media, mobility, unemployment, etc. ", className="card-text"),
                 html.P()
                 ], width = 6)
             ]),
@@ -834,7 +837,7 @@ UNEMPLOYMENT = [
                                     60:{'label':'Jan 2020'}, 61:{'label':''}, 62:{'label':'Mar 2020'}},
                                     min = 0,
                                     max = 62,
-                                    value = [0, 62],
+                                    value = [25, 62],
                                     allowCross=True
                                     )           
                         # ],  style = {
@@ -865,7 +868,7 @@ UNEMPLOYMENT = [
                     dcc.Dropdown(id = 'opt', 
                                  options = opts,
                                  placeholder="Select any states",
-                                 value = [opts[0]['value'],  opts[2]['value']],                                 
+                                 value = [opts[5]['value'],opts[19]['value'],  opts[31]['value'],opts[45]['value']],
                                  searchable=True,                              
                                  multi=True)
                         # ], style = {'width': '400px',
@@ -1141,10 +1144,10 @@ def update_fig(selected_countries, selected_measure):
 
     if selected_measure == "confirmed":
         layout = {"title": "Confirmed Case Growth Rate ", "height": 450, "plot_bgcolor": '#f5f7fa',
-                    "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest' }
+                    "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest', 'width':'90%'}
     elif selected_measure == "death":
         layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa',
-                     "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest'}
+                     "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest', 'width':'90%'}
 
 
     return dict(data = data,
@@ -1228,9 +1231,9 @@ def update_fig2(selected_states, selected_measure2):
     data = data  + NY + CA + others1 + others2
     
     if selected_measure2 == "confirmed":
-        layout = {"title": "Confirmed Case Growth Rate ", "height": 450,  "plot_bgcolor": '#f5f7fa','hovermode': 'closest'}
+        layout = {"title": "Confirmed Case Growth Rate ", "height": 450,  "plot_bgcolor": '#f5f7fa','hovermode': 'closest', 'width':'80%'}
     elif selected_measure2 == "death":
-        layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa','hovermode': 'closest'}
+        layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa','hovermode': 'closest', 'width':'80%'}
 
     return dict(data = data,
                 layout = layout)
