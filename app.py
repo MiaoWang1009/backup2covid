@@ -25,42 +25,42 @@ import math
 ####################################################################################
 #######################   Page 1 - Plot1.   Flatten the Curve      ################
 ####################################################################################
-def calculate_growth_rate_WORLD(df):
+# def calculate_growth_rate_WORLD(df):
     
-    df = df.drop(['Province/State', 'Lat', 'Long'], axis = 1)
+#     df = df.drop(['Province/State', 'Lat', 'Long'], axis = 1)
 
-    df =  df.groupby(['Country/Region']).sum().reset_index()
+#     df =  df.groupby(['Country/Region']).sum().reset_index()
 
-    df = df.transpose().reset_index()
-    df.columns = df.iloc[0,:]
-    df.drop([0], axis = 0, inplace = True)
-    df.reset_index(drop = True, inplace = True)
-    df.rename(columns = {'Country/Region' : 'Date'}, inplace = True)
-    df.Date = pd.to_datetime(df.Date)
+#     df = df.transpose().reset_index()
+#     df.columns = df.iloc[0,:]
+#     df.drop([0], axis = 0, inplace = True)
+#     df.reset_index(drop = True, inplace = True)
+#     df.rename(columns = {'Country/Region' : 'Date'}, inplace = True)
+#     df.Date = pd.to_datetime(df.Date)
 
-    df.drop(list(df.columns[1:][df.iloc[:,1:].sum(axis = 0) == 0]), axis = 1, inplace=True) 
-    df.drop(['Iceland', 'Kazakhstan', 'Slovakia'], axis = 1, inplace = True)
-    df.columns = ["South Korea" if x == "Korea, South" else x for x in list(df.columns)]
+#     df.drop(list(df.columns[1:][df.iloc[:,1:].sum(axis = 0) == 0]), axis = 1, inplace=True) 
+#     df.drop(['Iceland', 'Kazakhstan', 'Slovakia'], axis = 1, inplace = True)
+#     df.columns = ["South Korea" if x == "Korea, South" else x for x in list(df.columns)]
 
-    dfR = pd.DataFrame(np.empty_like(df))
-    dfR.columns = df.columns
-    dfR['Date'] = df['Date']
+#     dfR = pd.DataFrame(np.empty_like(df))
+#     dfR.columns = df.columns
+#     dfR['Date'] = df['Date']
 
 
-    for i in range(1, df.shape[1]):
-        country = df.columns[i]
-        j = np.where(df[country] > 0)[0][0]
-        dfR[country] = np.concatenate((np.full(j+5,np.nan), 
-                                                pow(np.array(df[country][j+5:]) / np.array(df[country][j:df.shape[0]-5]), 1/5) - 1),
-                                                axis = 0)  
-    for i in range(1, dfR.shape[1]):
-        s = [j for j in range(dfR.shape[0]) if not math.isnan(dfR.iloc[j,i])][0]
+#     for i in range(1, df.shape[1]):
+#         country = df.columns[i]
+#         j = np.where(df[country] > 0)[0][0]
+#         dfR[country] = np.concatenate((np.full(j+5,np.nan), 
+#                                                 pow(np.array(df[country][j+5:]) / np.array(df[country][j:df.shape[0]-5]), 1/5) - 1),
+#                                                 axis = 0)  
+#     for i in range(1, dfR.shape[1]):
+#         s = [j for j in range(dfR.shape[0]) if not math.isnan(dfR.iloc[j,i])][0]
         
-        for j in range(s+1, dfR.shape[0]-1):
-            dfR.iloc[j, i] = np.mean([dfR.iloc[j-1, i],
-                                                  dfR.iloc[j, i],
-                                                  dfR.iloc[j+1, i]])
-    return(dfR)
+#         for j in range(s+1, dfR.shape[0]-1):
+#             dfR.iloc[j, i] = np.mean([dfR.iloc[j-1, i],
+#                                                   dfR.iloc[j, i],
+#                                                   dfR.iloc[j+1, i]])
+#     return(dfR)
 
 def calculate_growth_rate_US(df):
     
@@ -106,11 +106,11 @@ def calculate_growth_rate_US(df):
     return(dfR)
 
 ### World Confirmed
-world_confirmed = pd.read_csv("JHU/time_series_covid19_confirmed_global.csv")
-world_confirmedR = calculate_growth_rate_WORLD(world_confirmed)
+world_confirmedR = pd.read_csv("calculate_growth_rate_WORLD.csv")
+#world_confirmedR = calculate_growth_rate_WORLD(world_confirmed)
 ### World Death
-world_death = pd.read_csv("JHU/time_series_covid19_deaths_global.csv")
-world_deathR = calculate_growth_rate_WORLD(world_death)
+world_deathR = pd.read_csv("calculate_death_rate_WORLD.csv")
+#world_deathR = calculate_growth_rate_WORLD(world_death)
 ### World color
 random.seed(125)
 
