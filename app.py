@@ -107,9 +107,14 @@ def calculate_growth_rate_US(df):
 
 ### World Confirmed
 world_confirmedR = pd.read_csv("calculate_growth_rate_WORLD.csv")
+#world_confirmedR.replace('United Kingdom', 'UK', inplace = True)
+world_confirmedR.rename(columns = {'United Kingdom': 'UK'}, inplace = True)
 #world_confirmedR = calculate_growth_rate_WORLD(world_confirmed)
+
 ### World Death
 world_deathR = pd.read_csv("calculate_death_rate_WORLD.csv")
+#world_deathR.replace('United Kingdom', 'UK', inplace = True)
+world_deathR.rename(columns = {'United Kingdom': 'UK'}, inplace = True)
 #world_deathR = calculate_growth_rate_WORLD(world_death)
 ### World color
 random.seed(125)
@@ -150,10 +155,10 @@ lockdown = lockdown.groupby(['Country/Region']).min().reset_index()
 lockdown['Date'] = pd.to_datetime(lockdown['Date'])
 lockdown['Country/Region'].replace('Mainland China', 'China', inplace = True)
 lockdown['Country/Region'].replace('The Bahamas', 'Bahamas', inplace = True)
-lockdown['Country/Region'].replace('UK', 'United Kingdom', inplace = True)
-lockdown['Type'].replace("Full", "Full lockdown", inplace = True)
-lockdown['Type'].replace("Partial", "Partial lockdown", inplace = True)
-lockdown['Type'].replace(np.nan, "Lockdown", inplace = True)
+#lockdown['Country/Region'].replace('UK', 'United Kingdom', inplace = True)
+lockdown['Type'].replace("Full", "full", inplace = True)
+lockdown['Type'].replace("Partial", "partial", inplace = True)
+lockdown['Type'].replace(np.nan, "lockdown", inplace = True)
 
 
 ### Lockdown US
@@ -371,18 +376,19 @@ NAVBAR = dbc.Navbar(
 ###########  Body Elements  #############
 
 FLATTEN_THE_CURVE = [
-    dbc.CardHeader(html.H5("Flatten The Curve")),
+    dbc.CardHeader(html.H5("Flatten The Curve - US")),
     dbc.CardBody([
         html.P("This page evaluated the lockdown and growth rates timeline on two levels: national-wise and global-wise. In the US, 42 states were on lockdown by Apr 7 (marked red), whereas most states in the central US were already partially open by Apr 21. Most states which are partially open claimed the stay-at-home earlier, whereas states with main metropolitan areas and cities generally started the lockdown later since there were more effects and concerns to lockdown major cities. ", className="card-text"),
         html.P("On the global level, the line chart demonstrated which government handled the pandemic effectively. For instance, South Korea started the lockdown right at the first outbreak and effectively stopped the spreading of the virus. Unfortunately, Italy had missed the best time to lock down the country, as shown that the stay-at-home order was not issued until several outbreaks. ", className="card-text"),
         html.P("The visualization showed that the stay-at-home order had helped flatten the curve, since the growth rates of both new cases and death had been steadily decreasing since the lockdowns on both national-wide and world-wide levels.", className="card-text"),
         html.P("Select multiple countries in the dropdown and control the slider to see the change of the lockdown policy on the maps and the fluctuation of growth rate in confirmed cases and death through time on the line charts. "),
+        #print(world_confirmedR.columns),
         dbc.Row([
             html.Label("Select countries to include in the line plot:", style={'marginLeft':'10px'}),
             dcc.Dropdown(
                         id = "selected_countries",
                         options=[{'label': x, 'value': x} for x in list(world_confirmedR.columns[1:])],
-                        value= ['US','United Kingdom', 'Italy', 'Germany', 'Spain', 'South Korea', 'India', 'Austria'],
+                        value= ['US', 'Italy','South Korea', 'India', 'Austria'],
                         multi=True,
                         style={'width': '99%', 'margin': '0px 5px 0px 5px'}
                         )
@@ -428,13 +434,15 @@ FLATTEN_THE_CURVE = [
             
 
         ]),
+
+        dbc.CardHeader(html.H5("Flatten The Curve - Global"), style = {'marginTop': '20px'}),
         dbc.Row([
             dbc.Col([
                 html.Label('Select states to include in the line plot: '),
                 dcc.Dropdown(
                             id = "selected_states",
                             options=[{'label': x, 'value': x} for x in list(us_confirmedR.columns[1:])],
-                            value= ['New York', 'California'],
+                            value= ['New York', 'California', 'Georgia', 'Pennsylvania', 'Colorado', 'Florida', 'Delaware'],
                             multi=True
                             )
                 ], width = 12)
@@ -1036,11 +1044,8 @@ def update_fig(selected_countries, selected_measure):
     data = []
     US = []
     IT = []
-    GM = []
-    SP = []
     SK = []
-    ID = []
-    UK = []
+
 
     if selected_measure == "confirmed":
         df = world_confirmedR
@@ -1066,6 +1071,7 @@ def update_fig(selected_countries, selected_measure):
                           textposition="top right",
                           textfont = dict(color = "rgba(53,92,125, 1)")
                             )]
+        selected_countries.remove('US')
     
     if "Italy"  in selected_countries:
         IT = [go.Scatter(x = df.Date,
@@ -1077,23 +1083,25 @@ def update_fig(selected_countries, selected_measure):
               go.Scatter(x = df.Date,
                           y = [df['Italy'][i] if pd.to_datetime(lockdown.Date[lockdown['Country/Region'] == 'Italy'].values[0]) == pd.Timestamp(df.Date[i]) else np.nan for i in range(df.shape[0])],
                           mode = 'markers',
+                          name = 'Italy (full lockdown)',
                           marker = dict(color = 'rgba(153,184,152, 0.9)', size = 10),
                             )]
+        selected_countries.remove('Italy')
 
-    if "Spain" in selected_countries:
-        SP = [go.Scatter(x = df.Date,
-                             y = df['Spain'],
-                             name = 'Spain',
-                             mode = 'lines',
-                             line = dict(color = 'rgba(237, 177, 131, 0.9)', width = 3, shape = 'spline'),
-                            ),
-              go.Scatter(x = df.Date,
-                          y = [df['Spain'][i] if pd.to_datetime(lockdown.Date[lockdown['Country/Region'] == 'Spain'].values[0]) == pd.Timestamp(df.Date[i]) else np.nan for i in range(df.shape[0])],
-                          mode = 'markers',
-                          marker = dict(color = 'rgba(237, 177, 131, 0.9)', size = 10),
-                          #text = ["Full" if lockdown.Date[lockdown['Country/Region'] == 'Spain'].values == df.Date[i] else "" for i in range(df.shape[0])],
-                          #textposition="top right"
-                            )]
+    # if "Spain" in selected_countries:
+    #     SP = [go.Scatter(x = df.Date,
+    #                          y = df['Spain'],
+    #                          name = 'Spain',
+    #                          mode = 'lines',
+    #                          line = dict(color = 'rgba(237, 177, 131, 0.9)', width = 3, shape = 'spline'),
+    #                         ),
+    #           go.Scatter(x = df.Date,
+    #                       y = [df['Spain'][i] if pd.to_datetime(lockdown.Date[lockdown['Country/Region'] == 'Spain'].values[0]) == pd.Timestamp(df.Date[i]) else np.nan for i in range(df.shape[0])],
+    #                       mode = 'markers',
+    #                       marker = dict(color = 'rgba(237, 177, 131, 0.9)', size = 10),
+    #                       #text = ["Full" if lockdown.Date[lockdown['Country/Region'] == 'Spain'].values == df.Date[i] else "" for i in range(df.shape[0])],
+    #                       #textposition="top right"
+    #                         )]
     if "South Korea" in selected_countries:
         SK = [go.Scatter(x = df.Date,
                              y = df['South Korea'],
@@ -1104,11 +1112,12 @@ def update_fig(selected_countries, selected_measure):
               go.Scatter(x = df.Date,
                           y = [df['South Korea'][i] if pd.to_datetime(lockdown.Date[lockdown['Country/Region'] == 'South Korea'].values[0]) == pd.Timestamp(df.Date[i]) else np.nan for i in range(df.shape[0])],
                           mode = 'markers',
+                          name = 'South Korea (full)',
                           marker = dict(color = 'rgba(246,114,128, 0.9)', size = 10),
                           #text = ["Full" if lockdown.Date[lockdown['Country/Region'] == 'South Korea'].values == df.Date[i] else "" for i in range(df.shape[0])],
                           #textposition="top right"
                             )]
-
+        selected_countries.remove('South Korea')
 
 
     others1 = [go.Scatter(x = df.Date, 
@@ -1119,22 +1128,23 @@ def update_fig(selected_countries, selected_measure):
                             width = 2, shape = 'spline')) for i in range(len(selected_countries))]
     others2 = [go.Scatter(x = df.Date,
                           y = [df[selected_countries[i]][j] if pd.to_datetime(lockdown.Date[lockdown['Country/Region'] == selected_countries[i]].values) == pd.Timestamp(df.Date.iloc[j]) else np.nan for j in range(df.shape[0])],
-                          #name = selected_countries[i] + ' (' + str(lockdown.Type[lockdown['Country/Region'] == selected_countries[i]].values[0]) + ')',
+                          name = selected_countries[i] + ' (' + str(lockdown.Type[lockdown['Country/Region'] == selected_countries[i]].values[0]) + ')',
                           mode = 'markers',
-                          #marker = dict(color = colors_World[selected_countries[i]],  size = 5),
+                          marker = dict(color = colors_World[selected_countries[i]],  size = 5),
                           #text = [lockdown['Type'][lockdown['Country/Region'] == selected_countries[i]].values[0] if pd.to_datetime(lockdown.Date[lockdown['Country/Region'] == selected_countries[i]].values) == pd.Timestamp(df.Date.iloc[j]) else "unknown type" for j in range(df.shape[0])],
                           #textposition="top right"
                             ) for i in range(len(selected_countries))]
 
     
 
-    data = data + others1 + others2 + US + IT + SP + SK + ID + GM + UK
+    data = data + US + IT + SK + others1 + others2 
 
     if selected_measure == "confirmed":
         layout = {"title": "Confirmed Case Growth Rate ", "height": 450, "plot_bgcolor": '#f5f7fa',
-                    "margin": "l=0, r=0, t=50, b=0, pad=0"}
+                    "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest' }
     elif selected_measure == "death":
-        layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa',}
+        layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa',
+                     "margin": "l=0, r=0, t=50, b=0, pad=0", 'hovermode': 'closest'}
 
 
     return dict(data = data,
@@ -1161,11 +1171,11 @@ def update_fig2(selected_states, selected_measure2):
         NY = [go.Scatter(x = df.Date,
                              y = df['New York'],
                              name = 'New York',
-                             mode = 'lines',
+                             mode = 'lines+text',
                              line = dict(color = 'rgba(53,92,125, 0.9)', width = 3, shape = 'spline'),
-                             #text = ["New York" if i == 38 else "" for i in range(df.shape[0])],
-                             #textposition = "top center",
-                             #textfont = dict(color = "rgba(53,92,125, 1)")
+                             text = ["New York" if i == 45 else "" for i in range(df.shape[0])],
+                             textposition = "top center",
+                             textfont = dict(color = "rgba(53,92,125, 1)")
                             ),
               go.Scatter(x = df.Date,
                           y = [df['New York'][i] if pd.to_datetime(lockdown2.Date[lockdown2['State'] == 'New York'].values[0]) == pd.Timestamp(df.Date[i]) else np.nan for i in range(df.shape[0])],
@@ -1178,25 +1188,28 @@ def update_fig2(selected_states, selected_measure2):
                           #textposition="top right",
                           #textfont = dict(color = "rgba(53,92,125, 1)")
                             )]
+        selected_states.remove('New York')
+
     if "California" in selected_states:
         CA = [go.Scatter(x = df.Date,
                              y = df['California'],
                              name = 'California',
                              mode = 'lines+text',
-                             line = dict(color = 'rgba(53,92,125, 0.9)', width = 3, shape = 'spline'),
+                             line = dict(color = 'rgba(245, 133, 29, 0.9)', width = 3, shape = 'spline'),
                              text = ["California" if i == 38 else "" for i in range(df.shape[0])],
                              textposition = "top center",
-                             textfont = dict(color = "rgba(53,92,125, 1)")
+                             textfont = dict(color = "rgba(245, 133, 29, 1)")
                             ),
               go.Scatter(x = df.Date,
                           y = [df['California'][i] if pd.to_datetime(lockdown2.Date[lockdown2['State'] == 'California'].values[0]) == pd.Timestamp(df.Date[i]) else np.nan for i in range(df.shape[0])],
                           name = 'California',
                           mode = 'markers',
-                          marker = dict(color = 'rgba(53,92,125, 1)', size = 10),
+                          marker = dict(color = 'rgba(245, 133, 29, 1)', size = 10),
                           #text = ["Partial" if pd.to_datetime(lockdown2.Date[lockdown2['Country/Region'] == 'US'].values[0]) == pd.Timestamp(df.Date[i]) else "" for i in range(df.shape[0])],
                           #textposition="top right",
                           #textfont = dict(color = "rgba(53,92,125, 1)")
                             )]
+        selected_states.remove('California')
 
     others1 = [go.Scatter(x = df.Date, 
                         y = df[selected_states[i]],
@@ -1212,12 +1225,12 @@ def update_fig2(selected_states, selected_measure2):
                           textposition="top right"
                             ) for i in range(len(selected_states))]
 
-    data = data + others1 + others2 + NY + CA
+    data = data  + NY + CA + others1 + others2
     
     if selected_measure2 == "confirmed":
-        layout = {"title": "Confirmed Case Growth Rate ", "height": 450,  "plot_bgcolor": '#f5f7fa',}
+        layout = {"title": "Confirmed Case Growth Rate ", "height": 450,  "plot_bgcolor": '#f5f7fa','hovermode': 'closest'}
     elif selected_measure2 == "death":
-        layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa',}
+        layout = {"title": "Death Case Growth Rate", "height": 450, "plot_bgcolor": '#f5f7fa','hovermode': 'closest'}
 
     return dict(data = data,
                 layout = layout)
