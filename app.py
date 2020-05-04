@@ -373,8 +373,7 @@ NAVBAR = dbc.Navbar(
 FLATTEN_THE_CURVE = [
     dbc.CardHeader(html.H5("Flatten The Curve")),
     dbc.CardBody([
-        html.P("The pandemic of COVID-19 has become one of the major challenges of global public health. To help the public and decision-makers better understand the trend and influence of COVID-19, this project not only created visualizations to demonstrate the underlying patterns of COVID-19 and its impacts, but also added interactive features which allowed users to focus on the relevant aspects and obtain interesting findings from the information. The website contained five tabs, representing COVID-19’s overview and its impacts on Mobility, Public Opinion, Unemployment, and Legislation to answer if the curve has been flattened through various perspectives such as social media, mobility, unemployment, etc. ", className="card-text"),
-        html.P("The Overview page evaluated the lockdown and growth rates timeline on two levels: national-wise and global-wise. In the US, 42 states were on lockdown by Apr 7 (marked red), whereas most states in the central US were already partially open by Apr 21. Most states which are partially open claimed the stay-at-home earlier, whereas states with main metropolitan areas and cities generally started the lockdown later since there were more effects and concerns to lockdown major cities. ", className="card-text"),
+        html.P("This page evaluated the lockdown and growth rates timeline on two levels: national-wise and global-wise. In the US, 42 states were on lockdown by Apr 7 (marked red), whereas most states in the central US were already partially open by Apr 21. Most states which are partially open claimed the stay-at-home earlier, whereas states with main metropolitan areas and cities generally started the lockdown later since there were more effects and concerns to lockdown major cities. ", className="card-text"),
         html.P("On the global level, the line chart demonstrated which government handled the pandemic effectively. For instance, South Korea started the lockdown right at the first outbreak and effectively stopped the spreading of the virus. Unfortunately, Italy had missed the best time to lock down the country, as shown that the stay-at-home order was not issued until several outbreaks. ", className="card-text"),
         html.P("The visualization showed that the stay-at-home order had helped flatten the curve, since the growth rates of both new cases and death had been steadily decreasing since the lockdowns on both national-wide and world-wide levels.", className="card-text"),
         html.P("Select multiple countries in the dropdown and control the slider to see the change of the lockdown policy on the maps and the fluctuation of growth rate in confirmed cases and death through time on the line charts. "),
@@ -615,10 +614,53 @@ MOBILITY =[
         html.P("Use the dropdown to select states and counties and adjust the slider to view the change of mobility through time. Due to the capacity limitation of the website server, the mobility page will be presented as a youtube video."),
         dbc.Row([
             dbc.Col([
-                html.Iframe(src = "https://www.youtube.com/embed/zWfyxknakAs", width="100%", height = '600px')
+                html.Iframe(src = " https://hack-cov19.herokuapp.com/", width="100%", height = '600px')
+                #html.Iframe(src = "https://www.youtube.com/embed/zWfyxknakAs", width="100%", height = '600px')
                 ], width = 12)
             ])
 
+        ])
+    ]
+
+
+INTRO =[
+    dbc.CardHeader(html.H5('Project Overview')),
+    dbc.CardBody([
+        html.H3("Impacts of COVID-19 and Government’s Responses "),
+        html.Br(),
+        html.H5("Group Members: Beixuan Jia, Luwei Lei, Miao Wang, Yuxin Zhang"),
+        html.Br(),
+        dbc.Row([
+            dbc.Col([
+                html.Img(src = "https://media.npr.org/assets/img/2020/03/21/ap_20081027616567-3b72d64770e83cd39f74c16df178c55feef9b8d6-s800-c85.jpg", width = '100%')
+                ], width = 6),
+
+            dbc.Col([
+                html.P("The pandemic of COVID-19 has become one of the major challenges of global public health. To help the public and decision-makers better understand the trend and influence of COVID-19, this project not only created visualizations to demonstrate the underlying patterns of COVID-19 and its impacts, but also added interactive features which allowed users to focus on the relevant aspects and obtain interesting findings from the information. The website contained six tabs, representing COVID-19’s overview and its impacts on Lockdown, Mobility, Public Opinion, Unemployment, and Legislation to answer if the curve has been flattened through various perspectives such as social media, mobility, unemployment, etc. ", className="card-text"),
+                html.P()
+                ], width = 6)
+            ]),
+        html.Br(),
+        html.H6("Data Source:"),
+        html.P(['   1. ', html.A("Johns Hopkins Coronavirus Dashboard Dataset", href='https://github.com/CSSEGISandData/COVID-19')]),
+        html.P(['   2. ', html.A("1Point3Acres covid19 dataset", href='https://coronavirus.1point3acres.com/en')]),
+        html.P(['   3. ', html.A("Worldwide Lockdown Dataset", href='https://www.kaggle.com/jcyzag/covid19-lockdown-dates-by-country#countryLockdowndates.csv')]),
+        html.P(['   4. ', html.A("US Lockdown Dataset", href='https://www.kaggle.com/lin0li/us-lockdown-dates-dataset')]),
+        html.P(['   5. ', html.A("Google Trends", href='https://trends.google.com/trends/?geo=US')]),
+        html.P(['   6. ', html.A("Covid-19 Twitter dataset", href='https://github.com/thepanacealab/covid19_twitter/tree/master/dailies/2020-03-22')]),
+        html.P(['   7. ', html.A("COVID-19 Legislation", href='https://www.quorum.us/spreadsheet/external/QCKYcPmSvYoAhnkIdcSS/')]),
+        html.P(['   8. ', html.A("Google COVID-19 Community Mobility Reports", href='https://www.google.com/covid19/mobility/')]),
+        html.P(['   9. ', html.A("Apple Mobility Data", href='https://www.apple.com/covid19/mobility')]),
+        html.P(['   10. ', html.A("538 Survey Data on US Coronavirus Concern and Response Approval", href='https://projects.fivethirtyeight.com/coronavirus-polls/')]),
+        html.P(['   11. ', html.A("U.S. Bureau of Labor Statistics", href='https://data.bls.gov/timeseries/LNS14000000')]),
+        html.P(['   12. ', html.A("U.S. Department of Labor", href='https://oui.doleta.gov/unemploy/claims.asp')]),
+        html.P('   13. Lockdown News from CNN'),
+        html.P('   14. Lockdown News from The New York Times'),
+        html.P('   15. Lockdown News from CNBC'),
+        html.P(['   16. ', html.A("National Public Radio News", href='https://www.npr.org/2020/03/21/819511621/coronavirus-deaths-spike-abroad-as-new-york-city-becomes-u-s-virus-epicenter')]),
+        html.Br(),
+        html.H6("Tools & Packages:"),
+        html.P('Python, Dash, Plotly, Flourish')
         ])
     ]
 
@@ -896,7 +938,12 @@ BODY = dbc.Container([
         #parent_className='custom-tabs',
         #className='custom-tabs-container',
         children = [
+
         dcc.Tab(label='Overview', children=[
+            dbc.Row([dbc.Col(dbc.Card(INTRO)),], style={"marginTop": 30})
+            ], className='custom-tab'),
+
+        dcc.Tab(label='Lockdown', children=[
             dbc.Row([dbc.Col(dbc.Card(FLATTEN_THE_CURVE)),], style={"marginTop": 30})
             #dbc.CardHeader(html.H5("Flatten The Curve")),
                 # dbc.CardBody([
